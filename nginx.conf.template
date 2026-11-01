@@ -1,0 +1,216 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2026 Marcus Quinn
+#
+# Internal nginx; Cloudron's proxy terminates TLS for every domain and sends
+# each to one of these ports (start.sh fills @APP_DOMAIN@):
+#   8000  app domain        -> dashboard SPA (+ OIDC callback and /healthz)
+#         any alias domain  -> tracking (customer tracking domains)
+#   8001  API domain        -> backend 127.0.0.1:8080 (incl. realtime socket proxy)
+#   8002  admin domain      -> admin SPA
+#   8003  tracking domain   -> tracking 127.0.0.1:3000
+#   8004  forms domain      -> forms 127.0.0.1:8090
+# Cloudron's X-Forwarded-* headers pass through unchanged, so the client
+# address stays one hop from the right; services trust only loopback.
+
+user cloudron;
+worker_processes 2;
+pid /run/nginx/nginx.pid;
+error_log stderr warn;
+
+events {
+	worker_connections 1024;
+}
+
+http {
+	include /etc/nginx/mime.types;
+	default_type application/octet-stream;
+
+	access_log off;
+	server_tokens off;
+	sendfile on;
+	tcp_nopush on;
+	keepalive_timeout 65;
+
+	client_body_temp_path /run/nginx/client-body;
+	proxy_temp_path /run/nginx/proxy;
+	fastcgi_temp_path /run/nginx/fastcgi;
+	scgi_temp_path /run/nginx/scgi;
+	uwsgi_temp_path /run/nginx/uwsgi;
+
+	map $http_upgrade $connection_upgrade {
+		default upgrade;
+		'' '';
+	}
+
+	upstream backend {
+		server 127.0.0.1:8080;
+		keepalive 16;
+	}
+
+	upstream tracking {
+		server 127.0.0.1:3000;
+		keepalive 16;
+	}
+
+	upstream forms {
+		server 127.0.0.1:8090;
+		keepalive 8;
+	}
+
+	# Shared by every proxied server. A location with any proxy_set_header of
+	# its own would drop all of these, so none does.
+	proxy_http_version 1.1;
+	proxy_set_header Host $http_host;
+	proxy_set_header Upgrade $http_upgrade;
+	proxy_set_header Connection $connection_upgrade;
+	proxy_set_header X-Forwarded-For $http_x_forwarded_for;
+	proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+	proxy_set_header X-Forwarded-Host $http_x_forwarded_host;
+	proxy_set_header X-Real-IP $http_x_real_ip;
+	# Only Cloudron's proxy is the edge: client-supplied edge headers are lies.
+	proxy_set_header CF-Connecting-IP "";
+	proxy_set_header True-Client-IP "";
+
+	# ── 8000: customer tracking domains (Cloudron aliases) ──────────────────
+	server {
+		listen 8000 default_server;
+		listen [::]:8000 default_server;
+
+		location = /healthz {
+			proxy_pass http://backend/health;
+		}
+
+		location / {
+			proxy_pass http://tracking;
+		}
+	}
+
+	# ── 8000: dashboard ─────────────────────────────────────────────────────
+	server {
+		listen 8000;
+		listen [::]:8000;
+		server_name @APP_DOMAIN@;
+		root /app/code/web;
+		index index.html;
+
+		location = /healthz {
+			proxy_pass http://backend/health;
+		}
+
+		# Cloudron registers OIDC redirect URIs on the app domain; the
+		# callback needs no cookie, so the backend can answer it here.
+		location = /v1/auth/oidc/callback {
+			proxy_pass http://backend;
+		}
+
+		location / {
+			include /run/warmbly/web-security-headers.conf;
+			try_files $uri $uri/ /index.html;
+		}
+
+		location = /index.html {
+			include /run/warmbly/web-security-headers.conf;
+			add_header Cache-Control "no-store" always;
+			# Package addition: "Continue with Cloudron" on the first sign-in
+			# screen (web-extra/cloudron-sso.js). Same origin, so the CSP's
+			# script-src 'self' already allows it.
+			sub_filter '</body>' '<script src="/cloudron-sso.js" defer></script></body>';
+			sub_filter_once on;
+		}
+
+		location = /cloudron-sso.js {
+			alias /app/code/web-extra/cloudron-sso.js;
+			include /run/warmbly/web-security-headers.conf;
+			add_header Cache-Control "no-cache" always;
+		}
+
+		location = /config.js {
+			alias /run/warmbly/web/config.js;
+			include /run/warmbly/web-security-headers.conf;
+			add_header Cache-Control "no-store" always;
+		}
+
+		location /assets/ {
+			include /run/warmbly/web-security-headers.conf;
+			add_header Cache-Control "public, max-age=31536000, immutable";
+		}
+
+		location = /mail-preview.html {
+			include /app/code/upstream/web-mail-preview-headers.conf;
+			add_header Cache-Control "no-store" always;
+		}
+
+		# Build-time inputs of the CSP renderer, not part of the app.
+		location ~ ^/csp-(template|origins|policy)\.txt$ {
+			return 404;
+		}
+	}
+
+	# ── 8001: API ───────────────────────────────────────────────────────────
+	server {
+		listen 8001 default_server;
+		listen [::]:8001 default_server;
+
+		# Contact imports and attachments; the backend enforces its own limits.
+		client_max_body_size 100m;
+
+		location / {
+			proxy_pass http://backend;
+			# Server-sent events, long polls and the proxied realtime socket.
+			proxy_buffering off;
+			proxy_read_timeout 1h;
+			proxy_send_timeout 1h;
+		}
+	}
+
+	# ── 8002: admin panel ───────────────────────────────────────────────────
+	server {
+		listen 8002 default_server;
+		listen [::]:8002 default_server;
+		root /app/code/admin;
+		index index.html;
+
+		location / {
+			include /app/code/upstream/admin-security-headers.conf;
+			try_files $uri $uri/ /index.html;
+		}
+
+		location = /index.html {
+			include /app/code/upstream/admin-security-headers.conf;
+			add_header Cache-Control "no-store" always;
+		}
+
+		location = /config.js {
+			alias /run/warmbly/admin/config.js;
+			include /app/code/upstream/admin-security-headers.conf;
+			add_header Cache-Control "no-store" always;
+		}
+
+		location /assets/ {
+			include /app/code/upstream/admin-security-headers.conf;
+			add_header Cache-Control "public, max-age=31536000, immutable";
+		}
+	}
+
+	# ── 8003: tracking ──────────────────────────────────────────────────────
+	server {
+		listen 8003 default_server;
+		listen [::]:8003 default_server;
+
+		location / {
+			proxy_pass http://tracking;
+		}
+	}
+
+	# ── 8004: hosted forms ──────────────────────────────────────────────────
+	server {
+		listen 8004 default_server;
+		listen [::]:8004 default_server;
+
+		client_max_body_size 10m;
+
+		location / {
+			proxy_pass http://forms;
+		}
+	}
+}

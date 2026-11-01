@@ -1,0 +1,82 @@
+{
+  "id": "com.warmbly.cloudronapp",
+  "title": "Warmbly",
+  "author": "Marcus Quinn <marcus@marcusquinn.com>",
+  "description": "file://DESCRIPTION.md",
+  "tagline": "Open-source B2B cold outreach and email warmup",
+  "version": "0.1.0",
+  "upstreamVersion": "0.6.70",
+  "healthCheckPath": "/healthz",
+  "httpPort": 8000,
+  "httpPorts": {
+    "API_DOMAIN": {
+      "title": "API domain",
+      "description": "API, unsubscribe links, OAuth callbacks and the realtime socket",
+      "containerPort": 8001,
+      "defaultValue": "warmbly-api"
+    },
+    "ADMIN_DOMAIN": {
+      "title": "Admin domain",
+      "description": "Instance admin panel",
+      "containerPort": 8002,
+      "defaultValue": "warmbly-admin"
+    },
+    "TRACK_DOMAIN": {
+      "title": "Tracking domain",
+      "description": "Open and click tracking in campaign mail",
+      "containerPort": 8003,
+      "defaultValue": "warmbly-t"
+    },
+    "FORM_DOMAIN": {
+      "title": "Forms domain",
+      "description": "Hosted lead-capture forms",
+      "containerPort": 8004,
+      "defaultValue": "warmbly-forms"
+    }
+  },
+  "multiDomain": true,
+  "manifestVersion": 2,
+  "website": "https://warmbly.com",
+  "contactEmail": "marcus@marcusquinn.com",
+  "icon": "file://logo.png",
+  "iconUrl": "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/logo.png",
+  "mediaLinks": [
+    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-1-mailboxes.png",
+    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-2-campaigns.png",
+    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-3-inbox.png",
+    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-4-deliverability.png",
+    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-5-crm.png"
+  ],
+  "documentationUrl": "https://github.com/marcusquinn/cloudron-warmbly-app/blob/main/README.md",
+  "upstreamLicense": {
+    "name": "Apache-2.0",
+    "url": "https://github.com/warmbly/warmbly/blob/63f10ef2d6865469640799309deba39150f140b1/LICENSE"
+  },
+  "minBoxVersion": "9.1.0",
+  "memoryLimit": 2147483648,
+  "optionalSso": true,
+  "addons": {
+    "localstorage": {},
+    "postgresql": {},
+    "redis": {},
+    "oidc": {
+      "loginRedirectUri": "/v1/auth/oidc/callback",
+      "tokenSignatureAlgorithm": "RS256"
+    },
+    "sendmail": {
+      "supportsDisplayName": true,
+      "requiresValidCertificate": true
+    }
+  },
+  "tags": [
+    "email",
+    "marketing",
+    "crm",
+    "sales",
+    "outreach"
+  ],
+  "postInstallMessage": "file://POSTINSTALL.md",
+  "changelog": "file://CHANGELOG",
+  "packagerName": "Marcus Quinn",
+  "packagerUrl": "https://github.com/marcusquinn"
+}

@@ -1,0 +1,239 @@
+Cloudron package patch: the first OIDC sign-in on an empty instance becomes
+its owner and platform admin.
+
+Opt-in with WARMBLY_OIDC_FIRST_USER_OWNER=true. While the instance still has
+no accounts and the option is on, /v1/auth/config reports setup_required=false
+so the login screen offers "Sign in with Cloudron" instead of redirecting to
+the setup-link page, and cloudron_first_owner=true so the package's login
+notice can say the first sign-in becomes the owner. The first account created by that OIDC sign-in receives
+the same full admin grant as the upstream `warmblyctl setup-link` claim. The
+grant runs under a Postgres advisory lock and only while no account holds any
+admin permission, so a later or concurrent user can never become a second
+owner. Apple, Google and password signups never take this path.
+
+Until that first OIDC sign-in, the empty instance is reserved for it:
+password, Apple and Google signups are refused and /v1/auth/config reports
+registration closed, so nobody can create the first account ahead of the
+owner. The setup link and warmblyctl do not use these gates and still work.
+
+diff --git a/internal/api/handler/auth_config.go b/internal/api/handler/auth_config.go
+--- a/internal/api/handler/auth_config.go
++++ b/internal/api/handler/auth_config.go
+@@ -4,6 +4,7 @@ import (
+ 	"net/http"
+ 
+ 	"github.com/gin-gonic/gin"
++	"github.com/warmbly/warmbly/internal/app/auth"
+ 	"github.com/warmbly/warmbly/internal/config"
+ )
+ 
+@@ -74,6 +75,11 @@ type DeploymentAuthConfig struct {
+ 	// nobody can yet use.
+ 	SetupRequired bool `json:"setup_required"`
+ 
++	// FirstOwner is true while the instance has no accounts and the first
++	// OIDC sign-in will claim it (Cloudron package patch). The package's
++	// login notice reads it; the upstream dashboard ignores it.
++	FirstOwner bool `json:"cloudron_first_owner"`
++
+ 	// InvitesRequired mirrors registration == invite_only, precomputed so the
+ 	// client does not reimplement the meaning of a tri-state string.
+ 	InvitesRequired bool `json:"invites_required"`
+@@ -133,6 +139,8 @@ func (h *Handler) AuthConfig(c *gin.Context) {
+ 
+ 	registration := h.AuthService.RegistrationMode(c.Request.Context())
+ 	websocketURL := h.websocketEndpoint()
++	setupRequired := h.BootstrapService != nil && h.BootstrapService.Required(c.Request.Context())
++	firstOwner := auth.OIDCFirstOwnerAvailable(providers)
+ 
+ 	c.JSON(http.StatusOK, DeploymentAuthConfig{
+ 		Captcha:           config.CaptchaProvider() != "none",
+@@ -148,7 +156,8 @@ func (h *Handler) AuthConfig(c *gin.Context) {
+ 		SelfHosted:        config.SelfHosted(),
+ 		GmailOAuthConnect: config.GoogleOAuthConnect(),
+ 		BillingEnabled:    config.BillingProvider() != "none",
+-		SetupRequired:     h.BootstrapService != nil && h.BootstrapService.Required(c.Request.Context()),
++		SetupRequired:     setupRequired && !firstOwner,
++		FirstOwner:        setupRequired && firstOwner,
+ 		InvitesRequired:   registration == config.RegistrationInviteOnly,
+ 		DocsURL:           accountsDocsURL,
+ 		WebsocketURL:      websocketURL,
+diff --git a/internal/app/auth/cloudron_first_owner.go b/internal/app/auth/cloudron_first_owner.go
+new file mode 100644
+--- /dev/null
++++ b/internal/app/auth/cloudron_first_owner.go
+@@ -0,0 +1,79 @@
++// Cloudron package patch: the first person to sign in through the OIDC
++// provider on an empty instance becomes its owner and platform admin, the
++// same grant the `warmblyctl setup-link` claim makes. Opt-in with
++// WARMBLY_OIDC_FIRST_USER_OWNER=true; Apple, Google and password signups never
++// take this path.
++package auth
++
++import (
++	"context"
++	"log"
++	"os"
++	"slices"
++	"strings"
++
++	"github.com/google/uuid"
++	"github.com/warmbly/warmbly/internal/models"
++	"github.com/warmbly/warmbly/internal/observability/errs"
++)
++
++// firstOwnerClaimer is satisfied by the Postgres user repository.
++type firstOwnerClaimer interface {
++	ClaimFirstOwner(ctx context.Context, userID uuid.UUID, permissions uint32) (bool, error)
++}
++
++// OIDCFirstUserOwner reports whether the first OIDC sign-in claims the instance.
++func OIDCFirstUserOwner() bool {
++	switch strings.ToLower(strings.TrimSpace(os.Getenv("WARMBLY_OIDC_FIRST_USER_OWNER"))) {
++	case "1", "true", "yes", "on":
++		return true
++	}
++	return false
++}
++
++// OIDCFirstOwnerAvailable reports whether an empty instance is claimed by
++// signing in with OIDC, so the login screen offers that instead of /setup.
++func OIDCFirstOwnerAvailable(providers []string) bool {
++	return OIDCFirstUserOwner() && slices.Contains(providers, models.IdentityProviderOIDC)
++}
++
++// firstOwnerCandidate is true for an OIDC signup on an instance with no users yet.
++func (s *authService) firstOwnerCandidate(ctx context.Context, provider string) bool {
++	if provider != models.IdentityProviderOIDC || !OIDCFirstUserOwner() {
++		return false
++	}
++	empty, err := s.userRepository.IsEmpty(ctx)
++	return err == nil && empty
++}
++
++// firstOwnerReserved is true while the empty instance is held for its first
++// OIDC sign-in. Password, Apple and Google signups are refused until then, so
++// a stranger cannot create the first account and take the owner slot. The
++// setup link and warmblyctl do not pass through these gates and still work.
++func (s *authService) firstOwnerReserved(ctx context.Context) bool {
++	if !OIDCFirstUserOwner() {
++		return false
++	}
++	empty, err := s.userRepository.IsEmpty(ctx)
++	return err == nil && empty
++}
++
++// claimFirstOwner grants full admin unless another account already holds
++// admin. It never fails the sign-in: the account exists either way, and
++// `warmblyctl user grant-admin` can still promote it by hand.
++func (s *authService) claimFirstOwner(ctx context.Context, userID uuid.UUID, address string) {
++	c, ok := s.userRepository.(firstOwnerClaimer)
++	if !ok {
++		log.Printf("Warning: first OIDC owner: the user repository cannot grant admin; %s stays an ordinary user.", address)
++		return
++	}
++	granted, err := c.ClaimFirstOwner(ctx, userID, uint32(models.AllAdminPermissions))
++	if err != nil {
++		errs.CaptureException(err)
++		log.Printf("Warning: first OIDC owner: granting admin to %s failed: %v", address, err)
++		return
++	}
++	if granted {
++		log.Printf("Setup: %s signed in first through OIDC and is now this instance's owner and platform admin.", address)
++	}
++}
+diff --git a/internal/app/auth/external_idtoken.go b/internal/app/auth/external_idtoken.go
+--- a/internal/app/auth/external_idtoken.go
++++ b/internal/app/auth/external_idtoken.go
+@@ -145,9 +145,13 @@ func (s *authService) resolveFederated(ctx context.Context, provider, issuer, su
+ 		// Just-in-time provisioning is a signup, so it answers to
+ 		// DISABLE_REGISTRATION like every other one. Without this an instance
+ 		// set to `true` is still open to anyone the IdP will assert.
++		if provider != models.IdentityProviderOIDC && s.firstOwnerReserved(ctx) {
++			return federatedResolution{}, errx.ErrRegistrationClosed
++		}
+ 		if xerr := s.federatedSignupAllowed(ctx, email.Address); xerr != nil {
+ 			return federatedResolution{}, xerr
+ 		}
++		firstOwner := s.firstOwnerCandidate(ctx, provider)
+ 		var cerr error
+ 		u, cerr = s.createExternalUser(ctx, email, firstName, lastName)
+ 		if errors.Is(cerr, repository.ErrUserEmailTaken) {
+@@ -161,6 +165,9 @@ func (s *authService) resolveFederated(ctx context.Context, provider, issuer, su
+ 			errs.CaptureException(cerr)
+ 			return federatedResolution{}, errx.InternalError()
+ 		}
++		if firstOwner {
++			s.claimFirstOwner(ctx, u.ID, email.Address)
++		}
+ 	} else {
+ 		if xerr := s.refuseSecondIdentity(ctx, u.ID, issuer); xerr != nil {
+ 			return federatedResolution{}, xerr
+diff --git a/internal/app/auth/provision.go b/internal/app/auth/provision.go
+--- a/internal/app/auth/provision.go
++++ b/internal/app/auth/provision.go
+@@ -256,6 +256,10 @@ func (s *authService) notifyOperatorSignup(u *models.User, workspace string) {
+ // accepting an invitation requires an account and the invitation is what would
+ // create one.
+ func (s *authService) signupAllowed(ctx context.Context, address, invite string) *errx.Error {
++	// Cloudron package patch: the first account belongs to the first OIDC sign-in.
++	if s.firstOwnerReserved(ctx) {
++		return errx.ErrRegistrationClosed
++	}
+ 	if s.policy.PublicSignupsAllowed() {
+ 		return nil
+ 	}
+@@ -414,6 +418,10 @@ func (s *authService) acceptPendingInvitation(ctx context.Context, userID uuid.U
+ // resolving the first-launch exemption so the login screen can show a signup
+ // form on a brand new instance.
+ func (s *authService) RegistrationMode(ctx context.Context) string {
++	// Cloudron package patch: no signup form while the first OIDC sign-in owns the empty instance.
++	if s.firstOwnerReserved(ctx) {
++		return config.RegistrationClosed
++	}
+ 	if s.policy.PublicSignupsAllowed() {
+ 		return config.RegistrationOpen
+ 	}
+diff --git a/internal/repository/pg_user.go b/internal/repository/pg_user.go
+--- a/internal/repository/pg_user.go
++++ b/internal/repository/pg_user.go
+@@ -294,6 +294,39 @@ func (r *userRepository) IsEmpty(ctx context.Context) (bool, error) {
+ 	return empty, err
+ }
+ 
++// ClaimFirstOwner grants full platform admin to userID only while no account
++// holds any admin permission. Cloudron package patch: the first OIDC sign-in
++// on an empty instance becomes its owner. A transaction-scoped advisory lock
++// serialises concurrent claims, so two simultaneous first sign-ins can never
++// both be granted; the loser stays an ordinary user.
++func (r *userRepository) ClaimFirstOwner(ctx context.Context, userID uuid.UUID, permissions uint32) (bool, error) {
++	tx, err := r.DB.Begin(ctx)
++	if err != nil {
++		return false, err
++	}
++	defer func() { _ = tx.Rollback(ctx) }()
++
++	if _, err := tx.Exec(ctx, `SELECT pg_advisory_xact_lock(hashtext('cloudron:first-oidc-owner'))`); err != nil {
++		return false, err
++	}
++	tag, err := tx.Exec(ctx, `
++		UPDATE users SET
++			admin_permissions = $2,
++			admin_granted_at = NOW(),
++			admin_granted_by = NULL,
++			updated_at = NOW()
++		WHERE id = $1
++		  AND NOT EXISTS (SELECT 1 FROM users WHERE admin_permissions <> 0)
++	`, userID, permissions)
++	if err != nil {
++		return false, err
++	}
++	if err := tx.Commit(ctx); err != nil {
++		return false, err
++	}
++	return tag.RowsAffected() == 1, nil
++}
++
+ func (r *userRepository) CountUsers(ctx context.Context) (int, error) {
+ 	const q = `SELECT count(*) FROM users`
+ 	var n int
