@@ -12,3 +12,8 @@
 [0.1.1]
 * Link the Cloudron forum topic for questions and feedback.
 * No change to the app; Warmbly is still 0.6.70 at upstream commit 63f10ef.
+
+[0.1.2]
+* Link the Community Apps Package button to this package's repository.
+* Requires Cloudron 10.0.0 or later; Cloudron 9 servers can no longer read this catalog.
+* No change to the app; Warmbly is still 0.6.70 at upstream commit 63f10ef.

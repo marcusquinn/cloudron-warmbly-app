@@ -72,7 +72,7 @@ cloudron update --app warmbly.example.com --force \
   --versions-url https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/main/CloudronVersions.json
 ```
 
-Requirements: Cloudron 9.1 or later, 2 GiB of memory for the app (raise it in
+Requirements: Cloudron 10.0 or later, 2 GiB of memory for the app (raise it in
 the app's *Resources* for many mailboxes).
 
 ### Choosing the tracking domain
