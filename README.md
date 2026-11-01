@@ -24,7 +24,8 @@ Cloudron store. See [DESIGN.md](DESIGN.md).
   hosted forms. Cloudron issues every certificate.
 - **Cloudron single sign-on.** Users with access to the app sign in with their
   Cloudron account (`oidc` addon); the first sign-in creates their Warmbly
-  account. Password sign-up stays invitation-only.
+  account. Password sign-up stays invitation-only, and is closed until the
+  owner has claimed the instance.
 - **Platform email through Cloudron.** Sign-in codes, password resets,
   invitations and digests go through the Cloudron mail relay (`sendmail`
   addon, STARTTLS with certificate verification).
@@ -79,7 +80,7 @@ Every campaign's open pixel, click links and unsubscribe page carry the
 tracking domain. If recipients complain about one workspace, URL blocklists
 list that host, and the listing reaches its registered domain. Use a
 **separate registered domain** for tracking (for example `t.example-links.com`),
-not a subdomain of your main site or mail domain. `warmblyctl doctor` warns
+not a subdomain of your main site or mail domain. `warmblyctl status` warns
 when they share a domain.
 
 ## Set up
@@ -95,9 +96,12 @@ when they share a domain.
    owner grant is a package patch
    ([`patches/0001-cloudron-oidc-first-user-owner.patch`](patches/0001-cloudron-oidc-first-user-owner.patch));
    it grants admin only while no account holds admin, so nobody after the
-   first can claim it. Set `WARMBLY_OIDC_FIRST_USER_OWNER=false` in
-   `/app/data/env` to use the upstream claim link instead. Without SSO, or
-   with that set, run in the app's *Terminal*:
+   first can claim it. Until then, password, Apple and Google sign-ups are
+   refused, so nobody can create the first account ahead of the owner. To
+   use the upstream claim link instead, set
+   `WARMBLY_OIDC_FIRST_USER_OWNER=false` in `/app/data/env` and **restart the
+   app** (the setting is read at start). Without SSO, or with that set, run
+   in the app's *Terminal*:
 
    ```sh
    warmblyctl setup-link
@@ -116,7 +120,6 @@ when they share a domain.
 
    ```sh
    warmblyctl status
-   warmblyctl doctor
    ```
 
 ## Customer tracking domains
@@ -160,8 +163,7 @@ app's environment:
 
 | Command | Does |
 |---|---|
-| `warmblyctl status` | Version, accounts, mail transport, health checks |
-| `warmblyctl doctor` | Full instance check with fixes |
+| `warmblyctl status` | Version, accounts, mail transport, and instance checks (URLs, tracking domain, realtime socket, mail) |
 | `warmblyctl setup-link` | Single-use link that claims an unclaimed instance |
 | `warmblyctl user create --email you@example.com --admin` | Create an account directly |
 
@@ -193,7 +195,7 @@ credentials. Without it, every mailbox must be reconnected.
 | Sign-in emails do not arrive | *Email → Outbound* status in Cloudron; the start log shows `platform mail: smtp`. |
 | No Cloudron sign-in button | The app was installed without Cloudron user management; use the setup link and password sign-in. |
 | Opens and clicks do not record | `https://<tracking domain>/health` must answer `OK`; for a customer domain, it must be an alias of the app. |
-| Dashboard does not update live | `warmblyctl doctor`; the realtime socket runs through the API domain at `/v1/realtime/socket/websocket`. |
+| Dashboard does not update live | `warmblyctl status`; the realtime socket runs through the API domain at `/v1/realtime/socket/websocket`. |
 
 Packaging bugs: [GitHub issues](https://github.com/marcusquinn/cloudron-warmbly-app/issues).
 

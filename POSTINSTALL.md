@@ -18,8 +18,11 @@ Open the link it prints and create the owner account and organization. The
 link is single-use; run the command again for a fresh one.
 </nosso>
 
-New sign-ups need an invitation by default (`DISABLE_REGISTRATION=invite_only`
-in `/app/data/env`). Invite the team from the dashboard.
+Cloudron sign-in needs no invitation: the app's **Access control** decides
+which Cloudron users can sign in (set `SSO_AUTO_PROVISION=false` in
+`/app/data/env` to require invitations for them too). Password sign-ups need
+an invitation (`DISABLE_REGISTRATION=invite_only`), and are closed until the
+owner has claimed the instance. Invite the team from the dashboard.
 
 The admin panel is on the **Admin domain** you chose. Customers' own tracking
 domains (a CNAME to your tracking domain) need adding as aliases of this app

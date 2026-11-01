@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2026 Marcus Quinn
 #
 # Upstream's operator CLI with the app's runtime environment, run as the app
-# user. From the Cloudron web terminal: warmblyctl status | doctor | backup ...
+# user. From the Cloudron web terminal: warmblyctl status | setup-link | user ...
 set -euo pipefail
 
 readonly ENV_FILE=/run/warmbly/env

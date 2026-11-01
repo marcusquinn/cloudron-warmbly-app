@@ -13,10 +13,22 @@ render_page() {
     local out="$3"
     local size="$4"
     local scale="$5"
-    "$chrome" --headless --disable-gpu --hide-scrollbars --allow-file-access-from-files \
+    local tmp
+    # Render into a fresh directory, so a stale or read-only destination can
+    # never pass for this run's output; replace the destination only on success.
+    tmp="$(mktemp -d)" || return 1
+    if ! "$chrome" --headless --disable-gpu --hide-scrollbars --allow-file-access-from-files \
         --window-size="$size" --force-device-scale-factor="$scale" --virtual-time-budget=3000 \
-        --screenshot="$out" "$url" >/dev/null 2>&1 || return 1
-    test -s "$out" || return 1
+        --screenshot="${tmp}/out.png" "$url" >/dev/null 2>&1 || ! test -s "${tmp}/out.png"; then
+        rm -rf "$tmp"
+        printf 'Failed to render %s\n' "$out" >&2
+        return 1
+    fi
+    if ! mv -f "${tmp}/out.png" "$out"; then
+        rm -rf "$tmp"
+        return 1
+    fi
+    rm -rf "$tmp"
     printf 'Rendered %s\n' "$out"
     return 0
 }

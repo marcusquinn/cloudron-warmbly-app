@@ -3,8 +3,8 @@
 * Single container: API, event consumer, mailbox worker, tracking, hosted forms, realtime gateway and NATS JetStream under supervisord, on Cloudron PostgreSQL and Redis.
 * Separate domains for the API, admin panel, tracking and forms; the realtime socket runs through the API domain.
 * Cloudron single sign-on (OIDC): a Cloudron user's first sign-in creates their account.
-* The first Cloudron sign-in on a new instance becomes its owner and platform admin; no setup link needed (`WARMBLY_OIDC_FIRST_USER_OWNER`).
+* The first Cloudron sign-in on a new instance becomes its owner and platform admin; no setup link needed (`WARMBLY_OIDC_FIRST_USER_OWNER`). Until then, password, Apple and Google sign-ups are refused, so nobody can take the instance first.
 * The sign-in screen offers "Continue with" your Cloudron straight away, without typing an email first, and says when the first sign-in will claim the instance.
 * Platform email through the Cloudron mail relay.
 * Customer tracking domains can be added as app aliases.
-* `warmblyctl` in the web terminal runs the upstream operator CLI (`setup-link`, `status`, `doctor`, `backup`).
+* `warmblyctl` in the web terminal runs the upstream operator CLI (`setup-link`, `status`, `user`, `backup`).

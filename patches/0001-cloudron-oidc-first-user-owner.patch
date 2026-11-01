@@ -11,35 +11,43 @@ grant runs under a Postgres advisory lock and only while no account holds any
 admin permission, so a later or concurrent user can never become a second
 owner. Apple, Google and password signups never take this path.
 
+Until that first OIDC sign-in, the empty instance is reserved for it:
+password, Apple and Google signups are refused and /v1/auth/config reports
+registration closed, so nobody can create the first account ahead of the
+owner. The setup link and warmblyctl do not use these gates and still work.
+
 diff --git a/internal/api/handler/auth_config.go b/internal/api/handler/auth_config.go
 --- a/internal/api/handler/auth_config.go
 +++ b/internal/api/handler/auth_config.go
-@@ -4,5 +4,6 @@ import (
+@@ -4,6 +4,7 @@ import (
  	"net/http"
  
  	"github.com/gin-gonic/gin"
 +	"github.com/warmbly/warmbly/internal/app/auth"
  	"github.com/warmbly/warmbly/internal/config"
  )
-@@ -73,6 +74,11 @@ type DeploymentAuthConfig struct {
- 	// login screen redirects to the setup page rather than showing a form
+ 
+@@ -74,6 +75,11 @@ type DeploymentAuthConfig struct {
  	// nobody can yet use.
  	SetupRequired bool `json:"setup_required"`
-+
+ 
 +	// FirstOwner is true while the instance has no accounts and the first
 +	// OIDC sign-in will claim it (Cloudron package patch). The package's
 +	// login notice reads it; the upstream dashboard ignores it.
 +	FirstOwner bool `json:"cloudron_first_owner"`
- 
++
  	// InvitesRequired mirrors registration == invite_only, precomputed so the
  	// client does not reimplement the meaning of a tri-state string.
-@@ -134,4 +140,6 @@ func (h *Handler) AuthConfig(c *gin.Context) {
+ 	InvitesRequired bool `json:"invites_required"`
+@@ -133,6 +139,8 @@ func (h *Handler) AuthConfig(c *gin.Context) {
+ 
  	registration := h.AuthService.RegistrationMode(c.Request.Context())
  	websocketURL := h.websocketEndpoint()
 +	setupRequired := h.BootstrapService != nil && h.BootstrapService.Required(c.Request.Context())
 +	firstOwner := auth.OIDCFirstOwnerAvailable(providers)
  
  	c.JSON(http.StatusOK, DeploymentAuthConfig{
+ 		Captcha:           config.CaptchaProvider() != "none",
 @@ -148,7 +156,8 @@ func (h *Handler) AuthConfig(c *gin.Context) {
  		SelfHosted:        config.SelfHosted(),
  		GmailOAuthConnect: config.GoogleOAuthConnect(),
@@ -54,7 +62,7 @@ diff --git a/internal/app/auth/cloudron_first_owner.go b/internal/app/auth/cloud
 new file mode 100644
 --- /dev/null
 +++ b/internal/app/auth/cloudron_first_owner.go
-@@ -0,0 +1,67 @@
+@@ -0,0 +1,79 @@
 +// Cloudron package patch: the first person to sign in through the OIDC
 +// provider on an empty instance becomes its owner and platform admin, the
 +// same grant the `warmblyctl setup-link` claim makes. Opt-in with
@@ -103,6 +111,18 @@ new file mode 100644
 +	return err == nil && empty
 +}
 +
++// firstOwnerReserved is true while the empty instance is held for its first
++// OIDC sign-in. Password, Apple and Google signups are refused until then, so
++// a stranger cannot create the first account and take the owner slot. The
++// setup link and warmblyctl do not pass through these gates and still work.
++func (s *authService) firstOwnerReserved(ctx context.Context) bool {
++	if !OIDCFirstUserOwner() {
++		return false
++	}
++	empty, err := s.userRepository.IsEmpty(ctx)
++	return err == nil && empty
++}
++
 +// claimFirstOwner grants full admin unless another account already holds
 +// admin. It never fails the sign-in: the account exists either way, and
 +// `warmblyctl user grant-admin` can still promote it by hand.
@@ -125,7 +145,13 @@ new file mode 100644
 diff --git a/internal/app/auth/external_idtoken.go b/internal/app/auth/external_idtoken.go
 --- a/internal/app/auth/external_idtoken.go
 +++ b/internal/app/auth/external_idtoken.go
-@@ -148,6 +148,7 @@ func (s *authService) resolveFederated(ctx context.Context, provider, issuer, su
+@@ -145,9 +145,13 @@ func (s *authService) resolveFederated(ctx context.Context, provider, issuer, su
+ 		// Just-in-time provisioning is a signup, so it answers to
+ 		// DISABLE_REGISTRATION like every other one. Without this an instance
+ 		// set to `true` is still open to anyone the IdP will assert.
++		if provider != models.IdentityProviderOIDC && s.firstOwnerReserved(ctx) {
++			return federatedResolution{}, errx.ErrRegistrationClosed
++		}
  		if xerr := s.federatedSignupAllowed(ctx, email.Address); xerr != nil {
  			return federatedResolution{}, xerr
  		}
@@ -133,7 +159,7 @@ diff --git a/internal/app/auth/external_idtoken.go b/internal/app/auth/external_
  		var cerr error
  		u, cerr = s.createExternalUser(ctx, email, firstName, lastName)
  		if errors.Is(cerr, repository.ErrUserEmailTaken) {
-@@ -161,6 +162,9 @@ func (s *authService) resolveFederated(ctx context.Context, provider, issuer, su
+@@ -161,6 +165,9 @@ func (s *authService) resolveFederated(ctx context.Context, provider, issuer, su
  			errs.CaptureException(cerr)
  			return federatedResolution{}, errx.InternalError()
  		}
@@ -143,14 +169,38 @@ diff --git a/internal/app/auth/external_idtoken.go b/internal/app/auth/external_
  	} else {
  		if xerr := s.refuseSecondIdentity(ctx, u.ID, issuer); xerr != nil {
  			return federatedResolution{}, xerr
+diff --git a/internal/app/auth/provision.go b/internal/app/auth/provision.go
+--- a/internal/app/auth/provision.go
++++ b/internal/app/auth/provision.go
+@@ -256,6 +256,10 @@ func (s *authService) notifyOperatorSignup(u *models.User, workspace string) {
+ // accepting an invitation requires an account and the invitation is what would
+ // create one.
+ func (s *authService) signupAllowed(ctx context.Context, address, invite string) *errx.Error {
++	// Cloudron package patch: the first account belongs to the first OIDC sign-in.
++	if s.firstOwnerReserved(ctx) {
++		return errx.ErrRegistrationClosed
++	}
+ 	if s.policy.PublicSignupsAllowed() {
+ 		return nil
+ 	}
+@@ -414,6 +418,10 @@ func (s *authService) acceptPendingInvitation(ctx context.Context, userID uuid.U
+ // resolving the first-launch exemption so the login screen can show a signup
+ // form on a brand new instance.
+ func (s *authService) RegistrationMode(ctx context.Context) string {
++	// Cloudron package patch: no signup form while the first OIDC sign-in owns the empty instance.
++	if s.firstOwnerReserved(ctx) {
++		return config.RegistrationClosed
++	}
+ 	if s.policy.PublicSignupsAllowed() {
+ 		return config.RegistrationOpen
+ 	}
 diff --git a/internal/repository/pg_user.go b/internal/repository/pg_user.go
 --- a/internal/repository/pg_user.go
 +++ b/internal/repository/pg_user.go
-@@ -293,5 +293,38 @@ func (r *userRepository) IsEmpty(ctx context.Context) (bool, error) {
- 	err := r.DB.QueryRow(ctx, q).Scan(&empty)
+@@ -294,6 +294,39 @@ func (r *userRepository) IsEmpty(ctx context.Context) (bool, error) {
  	return empty, err
  }
-+
+ 
 +// ClaimFirstOwner grants full platform admin to userID only while no account
 +// holds any admin permission. Cloudron package patch: the first OIDC sign-in
 +// on an empty instance becomes its owner. A transaction-scoped advisory lock
@@ -183,5 +233,7 @@ diff --git a/internal/repository/pg_user.go b/internal/repository/pg_user.go
 +	}
 +	return tag.RowsAffected() == 1, nil
 +}
- 
++
  func (r *userRepository) CountUsers(ctx context.Context) (int, error) {
+ 	const q = `SELECT count(*) FROM users`
+ 	var n int

@@ -84,10 +84,11 @@ on the server; `cloudron update --app <test-location>` rebuilds. This exercises
 the package, not the catalog. Check:
 
 - `https://<app>/healthz`, `https://<API domain>/health` and
-  `https://<tracking domain>/health` answer; `warmblyctl status` and
-  `warmblyctl doctor` in the app's *Terminal* report no failures.
+  `https://<tracking domain>/health` answer; `warmblyctl status` in the app's
+  *Terminal* reports no failures.
 - `https://<API domain>/v1/auth/config` lists the `oidc` provider. On a fresh
-  install it reports `cloudron_first_owner: true`.
+  install it reports `cloudron_first_owner: true` and `registration: "true"`
+  (closed), and `POST /v1/auth/register` is refused until the owner signs in.
 - The sign-in screen shows *Continue with* the Cloudron's name with the
   first-owner note; the first Cloudron sign-in becomes owner and platform
   admin, and `cloudron_first_owner` then turns `false`. A second Cloudron user
