@@ -38,9 +38,10 @@ Cloudron store. See [DESIGN.md](DESIGN.md).
 
 ## Install
 
-**From the catalog** (once a version is published). In the Cloudron dashboard,
-open *Settings → Community apps*, add the catalog URL below and install Warmbly
-from the App Store, or use the CLI:
+**From the catalog.** In the Cloudron dashboard, open *Settings → Community
+apps*, add the catalog URL below and install Warmbly from the App Store, or use
+the CLI. The app is also listed on
+[Cloudron Community Apps](https://ca.cloudron.io/app/com.warmbly.cloudronapp).
 
 ```sh
 cloudron install --versions-url https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/main/CloudronVersions.json --location warmbly.example.com
@@ -197,6 +198,8 @@ credentials. Without it, every mailbox must be reconnected.
 | Opens and clicks do not record | `https://<tracking domain>/health` must answer `OK`; for a customer domain, it must be an alias of the app. |
 | Dashboard does not update live | `warmblyctl status`; the realtime socket runs through the API domain at `/v1/realtime/socket/websocket`. |
 
+Questions and feedback: the
+[Cloudron forum topic](https://forum.cloudron.io/topic/16229/warmbly-open-source-cold-outreach-and-email-warmup-campaigns-unified-inbox-crm-with-cloudron-sso-and-cloudron-mail).
 Packaging bugs: [GitHub issues](https://github.com/marcusquinn/cloudron-warmbly-app/issues).
 
 ## Documentation

@@ -127,7 +127,11 @@ that commit in a second commit.
 To list the app on [Cloudron Community Apps](https://ca.cloudron.io), sign in,
 add the catalog URL to your apps, and check the imported title, icon,
 screenshots, changelog and install link. Then announce it in the forum's
-[Community Apps](https://forum.cloudron.io/category/220/community-apps)
+[Community Packages](https://forum.cloudron.io/category/220/community-packages)
 category and add the topic as `forumUrl` in the manifest for the next
 version. Both the listing and the announcement are publication actions for
 the maintainer.
+
+Current listing: <https://ca.cloudron.io/app/com.warmbly.cloudronapp>.
+Announcement:
+<https://forum.cloudron.io/topic/16229/warmbly-open-source-cold-outreach-and-email-warmup-campaigns-unified-inbox-crm-with-cloudron-sso-and-cloudron-mail>.
