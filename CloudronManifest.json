@@ -39,6 +39,14 @@
   "website": "https://warmbly.com",
   "contactEmail": "marcus@marcusquinn.com",
   "icon": "file://logo.png",
+  "iconUrl": "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/logo.png",
+  "mediaLinks": [
+    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-1-mailboxes.png",
+    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-2-campaigns.png",
+    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-3-inbox.png",
+    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-4-deliverability.png",
+    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-5-crm.png"
+  ],
   "documentationUrl": "https://github.com/marcusquinn/cloudron-warmbly-app/blob/main/README.md",
   "upstreamLicense": {
     "name": "Apache-2.0",
