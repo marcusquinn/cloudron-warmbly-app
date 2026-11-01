@@ -4,7 +4,7 @@
   "author": "Marcus Quinn <marcus@marcusquinn.com>",
   "description": "file://DESCRIPTION.md",
   "tagline": "Open-source B2B cold outreach and email warmup",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "upstreamVersion": "0.6.70",
   "healthCheckPath": "/healthz",
   "httpPort": 8000,
@@ -53,7 +53,7 @@
     "name": "Apache-2.0",
     "url": "https://github.com/warmbly/warmbly/blob/63f10ef2d6865469640799309deba39150f140b1/LICENSE"
   },
-  "minBoxVersion": "9.1.0",
+  "minBoxVersion": "10.0.0",
   "memoryLimit": 2147483648,
   "optionalSso": true,
   "addons": {
@@ -79,5 +79,6 @@
   "postInstallMessage": "file://POSTINSTALL.md",
   "changelog": "file://CHANGELOG",
   "packagerName": "Marcus Quinn",
-  "packagerUrl": "https://github.com/marcusquinn"
+  "packagerUrl": "https://github.com/marcusquinn",
+  "packageUrl": "https://github.com/marcusquinn/cloudron-warmbly-app"
 }
