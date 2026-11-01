@@ -1,0 +1,51 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: MIT -->
+<!-- README and social banner: render with scripts/render-store-media.sh (1280x640). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 1280px; height: 640px; overflow: hidden; }
+  body {
+    background:
+      radial-gradient(640px 420px at 1180px -60px, rgba(56, 189, 248, .38), transparent 70%),
+      radial-gradient(560px 400px at 80px 720px, rgba(59, 130, 246, .30), transparent 70%),
+      linear-gradient(160deg, #0b1626 0%, #0e2340 100%);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  .copy { position: absolute; left: 72px; top: 0; bottom: 0; width: 470px;
+          display: flex; flex-direction: column; justify-content: center; }
+  .brand { display: flex; align-items: center; gap: 18px; }
+  .brand img { width: 76px; height: 76px; border-radius: 18px;
+               box-shadow: 0 12px 30px -8px rgba(0, 0, 0, .55); }
+  .brand span { color: #7dd3fc; font-size: 15px; font-weight: 600;
+                letter-spacing: .16em; text-transform: uppercase; }
+  h1 { color: #f8fafc; font-size: 56px; line-height: 1.05; font-weight: 750;
+       margin: 30px 0 18px; letter-spacing: -.02em; }
+  p { color: #a5b4c8; font-size: 21px; line-height: 1.45; margin: 0 0 28px; }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  li { color: #dbe7f5; font-size: 17px; display: flex; align-items: center; gap: 12px; }
+  li::before { content: ""; width: 8px; height: 8px; border-radius: 50%;
+               background: #38bdf8; box-shadow: 0 0 0 4px rgba(56, 189, 248, .18); }
+  .frame { position: absolute; left: 600px; top: 86px; width: 760px; height: 620px;
+           overflow: hidden; border-radius: 14px 0 0 0; border: 1px solid #23395a;
+           background: #fff; box-shadow: 0 30px 70px -14px rgba(0, 0, 0, .65); }
+  .frame img { position: absolute; left: -98px; top: -80px; width: 1800px; display: block; }
+</style>
+</head>
+<body>
+  <div class="copy">
+    <div class="brand"><img src="../../logo.png" alt=""><span>Cloudron app</span></div>
+    <h1>Warmbly for Cloudron</h1>
+    <p>Open-source cold outreach and email warmup, self-hosted with Cloudron sign-in, mail and backups.</p>
+    <ul>
+      <li>Mailbox warmup and health scores</li>
+      <li>Multi-step campaigns and a unified inbox</li>
+      <li>Deliverability tracking and a built-in CRM</li>
+    </ul>
+  </div>
+  <div class="frame"><img src="../upstream/og-image.jpg" alt=""></div>
+</body>
+</html>

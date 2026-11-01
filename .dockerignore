@@ -1,0 +1,12 @@
+.git
+.github
+.agents
+docs
+media
+scripts
+test
+todo
+CloudronVersions.json
+*.md
+!DESCRIPTION.md
+!POSTINSTALL.md

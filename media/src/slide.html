@@ -1,0 +1,66 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: MIT -->
+<!-- Store slide template: render with scripts/render-store-media.sh (1200x400 at 2x). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 1200px; height: 400px; overflow: hidden; }
+  body {
+    background:
+      radial-gradient(520px 320px at 1080px -40px, rgba(56, 189, 248, .35), transparent 70%),
+      radial-gradient(420px 300px at 120px 460px, rgba(59, 130, 246, .28), transparent 70%),
+      linear-gradient(160deg, #0b1626 0%, #0e2340 100%);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  .copy { position: absolute; left: 56px; top: 0; bottom: 0; width: 330px;
+          display: flex; flex-direction: column; justify-content: center; }
+  .eyebrow { display: flex; align-items: center; gap: 10px; color: #7dd3fc;
+             font-size: 12.5px; font-weight: 600; letter-spacing: .14em;
+             text-transform: uppercase; }
+  .eyebrow img { width: 22px; height: 22px; border-radius: 6px; }
+  .rule { width: 36px; height: 2px; background: #38bdf8; margin: 14px 0 18px; }
+  h1 { color: #f8fafc; font-size: 34px; line-height: 1.15; font-weight: 700;
+       margin: 0 0 14px; letter-spacing: -.01em; }
+  p { color: #a5b4c8; font-size: 16.5px; line-height: 1.5; margin: 0; }
+  .frame { position: absolute; left: 440px; top: 48px; width: 820px; height: 420px;
+           overflow: hidden; border-radius: 12px 0 0 0; border: 1px solid #23395a;
+           background: #fff; box-shadow: 0 24px 60px -12px rgba(0, 0, 0, .6); }
+  .frame img { position: absolute; display: block; }
+</style>
+</head>
+<body>
+  <div class="copy">
+    <div class="eyebrow"><img src="../../logo.png" alt="">Warmbly on Cloudron</div>
+    <div class="rule"></div>
+    <h1 id="title"></h1>
+    <p id="body"></p>
+  </div>
+  <div class="frame"><img id="shot" alt=""></div>
+<script>
+  // Slides: image, rendered width (CSS px), left and top offset (CSS px), headline, body line.
+  var slides = {
+    "1": ["og-image.jpg", 1240, -68, -54, "Warm up every sending mailbox",
+          "Connect Google, Microsoft and IMAP/SMTP mailboxes. Warmup ramps volume while health scores watch each one."],
+    "2": ["campaign-steps.webp", 960, -175, -40, "Multi-step outreach sequences",
+          "Build campaigns step by step, with delays, threaded follow-ups and stop on reply."],
+    "3": ["dashboard-inbox.png", 1100, -196, -42, "Every reply in one inbox",
+          "Replies from all mailboxes land in one unified inbox, with categories, snooze and scheduled sends."],
+    "4": ["deliverability.webp", 1100, -196, -42, "Deliverability you can see",
+          "Bounce and complaint rates, warmup inbox placement and suppressions across your mailboxes."],
+    "5": ["deals.webp", 1100, -196, -42, "A CRM built in",
+          "Turn replies into deals, pipelines, tasks and meetings without leaving Warmbly."]
+  };
+  var s = slides[location.hash.slice(1)] || slides["1"];
+  var img = document.getElementById("shot");
+  img.src = "../upstream/" + s[0];
+  img.style.width = s[1] + "px";
+  img.style.left = s[2] + "px";
+  img.style.top = s[3] + "px";
+  document.getElementById("title").textContent = s[4];
+  document.getElementById("body").textContent = s[5];
+</script>
+</body>
+</html>

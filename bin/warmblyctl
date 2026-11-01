@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2026 Marcus Quinn
+#
+# Upstream's operator CLI with the app's runtime environment, run as the app
+# user. From the Cloudron web terminal: warmblyctl status | doctor | backup ...
+set -euo pipefail
+
+readonly ENV_FILE=/run/warmbly/env
+
+[[ -r "${ENV_FILE}" ]] || {
+	printf 'warmblyctl: %s is missing; is the app running?\n' "${ENV_FILE}" >&2
+	exit 1
+}
+# shellcheck source=/dev/null
+source "${ENV_FILE}"
+cd /app/data
+exec /usr/local/bin/gosu cloudron:cloudron /app/code/services/warmblyctl "$@"

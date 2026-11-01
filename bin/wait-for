@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2026 Marcus Quinn
+#
+# wait-for PORT... -- COMMAND [ARG...]
+# Holds a service until each loopback PORT accepts connections, then execs it,
+# so first-boot ordering (NATS, then the backend and its migrations) does not
+# turn into crash loops. Gives up waiting after WAIT_FOR_SECONDS (default 600)
+# and starts anyway; supervisord restarts it if it then fails.
+set -euo pipefail
+
+ports=()
+while [[ $# -gt 0 && "$1" != "--" ]]; do
+	ports+=("$1")
+	shift
+done
+[[ "${1:-}" == "--" ]] || {
+	printf 'usage: wait-for PORT... -- COMMAND [ARG...]\n' >&2
+	exit 64
+}
+shift
+[[ $# -gt 0 ]] || {
+	printf 'wait-for: no command given\n' >&2
+	exit 64
+}
+
+port_open() {
+	local port="$1"
+	(exec 3<>"/dev/tcp/127.0.0.1/${port}") 2>/dev/null
+	return $?
+}
+
+limit="${WAIT_FOR_SECONDS:-600}"
+for port in "${ports[@]}"; do
+	waited=0
+	until port_open "${port}"; do
+		if ((waited >= limit)); then
+			printf 'wait-for: 127.0.0.1:%s is not up after %ss; starting %s anyway\n' "${port}" "${limit}" "$1" >&2
+			break
+		fi
+		sleep 1
+		waited=$((waited + 1))
+	done
+done
+
+exec "$@"
