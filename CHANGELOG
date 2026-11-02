@@ -21,3 +21,9 @@
 [0.1.3]
 * The Community Apps Package link now opens this repository. The listing builds that link from packagerUrl, so the 0.1.2 packageUrl change had no visible effect.
 * No change to the app; Warmbly is still 0.6.70 at upstream commit 63f10ef.
+
+[0.1.4]
+* Update Warmbly to 0.6.72 at upstream commit 8ce7c0c, with release image digests pinned from upstream's images.json.
+* Mailbox health follows current server evidence and no longer shows temporary failures on working mailboxes; warmup explains when it skips a persona's off-days (upstream 0.6.71 and 0.6.72).
+* Reply interest can be read in German, French and Spanish for workspaces that choose those tagging languages (upstream 0.6.71).
+* Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
