@@ -21,3 +21,8 @@
 [0.1.3]
 * The Community Apps Package link now opens this repository. The listing builds that link from packagerUrl, so the 0.1.2 packageUrl change had no visible effect.
 * No change to the app; Warmbly is still 0.6.70 at upstream commit 63f10ef.
+
+[0.1.4]
+* Update Warmbly to 0.6.72 at upstream commit 8ce7c0c, with release image digests pinned from upstream's images.json.
+* Includes upstream mailbox health reporting and mail transport recovery improvements.
+* Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
