@@ -447,6 +447,96 @@
             "creationDate": "Mon, 02 Nov 2026 22:32:19 GMT",
             "ts": "Mon, 02 Nov 2026 22:32:19 GMT",
             "publishState": "published"
+        },
+        "0.1.5": {
+            "manifest": {
+                "id": "com.warmbly.cloudronapp",
+                "title": "Warmbly",
+                "author": "Marcus Quinn <marcus@marcusquinn.com>",
+                "description": "Warmbly is an open-source platform for B2B cold outreach and email warmup:\nmulti-step campaigns across many mailboxes, a unified inbox for every reply,\na CRM, and the deliverability tooling that keeps those mailboxes out of spam.\n\n### Features\n\n* **Campaigns:** multi-step sequences with per-mailbox caps and spacing.\n* **Unified inbox:** every connected mailbox and reply in one place.\n* **CRM:** contacts, pipelines, deals, tasks and meetings.\n* **Warmup:** a monitored pool of real mailboxes.\n* **Deliverability:** bounces, complaints, suppression lists and open/click\n  tracking on your own tracking domain.\n* **Hosted forms:** lead-capture pages and embeds.\n* **Automations:** visual reply playbooks, with optional AI steps using your\n  own provider key.\n* **Integrations:** HubSpot, Pipedrive, Slack, Zapier, REST API and webhooks.\n* **Realtime:** live presence and updates across the team.\n\n### Cloudron integration\n\n* **Single sign-on:** Cloudron users can sign in with their Cloudron account.\n* **Outgoing mail:** sign-in codes, password resets and invitations go\n  through the Cloudron mail relay.\n* **Own domains:** the dashboard, API, admin panel, tracking and forms each\n  get a domain with a Cloudron certificate. Add customers' tracking domains\n  as aliases of the app.\n* **Backups:** the PostgreSQL database, stored files and the encryption keys\n  are in Cloudron backups.\n\nThe whole self-host stack (API, event consumer, mailbox worker, tracking,\nforms, realtime gateway and NATS) runs in one container on Cloudron's\nPostgreSQL and Redis. No cloud account is needed.\n\n[Warmbly](https://github.com/warmbly/warmbly) is open source under the\nApache-2.0 licence. This package is maintained independently of the Warmbly\nproject.\n",
+                "tagline": "Open-source B2B cold outreach and email warmup",
+                "version": "0.1.5",
+                "upstreamVersion": "0.6.75",
+                "healthCheckPath": "/healthz",
+                "httpPort": 8000,
+                "httpPorts": {
+                    "API_DOMAIN": {
+                        "title": "API domain",
+                        "description": "API, unsubscribe links, OAuth callbacks and the realtime socket",
+                        "containerPort": 8001,
+                        "defaultValue": "warmbly-api"
+                    },
+                    "ADMIN_DOMAIN": {
+                        "title": "Admin domain",
+                        "description": "Instance admin panel",
+                        "containerPort": 8002,
+                        "defaultValue": "warmbly-admin"
+                    },
+                    "TRACK_DOMAIN": {
+                        "title": "Tracking domain",
+                        "description": "Open and click tracking in campaign mail",
+                        "containerPort": 8003,
+                        "defaultValue": "warmbly-t"
+                    },
+                    "FORM_DOMAIN": {
+                        "title": "Forms domain",
+                        "description": "Hosted lead-capture forms",
+                        "containerPort": 8004,
+                        "defaultValue": "warmbly-forms"
+                    }
+                },
+                "multiDomain": true,
+                "manifestVersion": 2,
+                "website": "https://warmbly.com",
+                "contactEmail": "marcus@marcusquinn.com",
+                "icon": "file://logo.png",
+                "iconUrl": "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/logo.png",
+                "mediaLinks": [
+                    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-1-mailboxes.png",
+                    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-2-campaigns.png",
+                    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-3-inbox.png",
+                    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-4-deliverability.png",
+                    "https://raw.githubusercontent.com/marcusquinn/cloudron-warmbly-app/c0b5e975a2f2ccc17f93c0eb6704d492dbd7fcb9/media/listing-5-crm.png"
+                ],
+                "documentationUrl": "https://github.com/marcusquinn/cloudron-warmbly-app/blob/main/README.md",
+                "forumUrl": "https://forum.cloudron.io/topic/16229/warmbly-open-source-cold-outreach-and-email-warmup-campaigns-unified-inbox-crm-with-cloudron-sso-and-cloudron-mail",
+                "upstreamLicense": {
+                    "name": "Apache-2.0",
+                    "url": "https://github.com/warmbly/warmbly/blob/15541eafe6561a6a985b13b09e96c831d3f4d240/LICENSE"
+                },
+                "minBoxVersion": "10.0.0",
+                "memoryLimit": 2147483648,
+                "optionalSso": true,
+                "addons": {
+                    "localstorage": {},
+                    "postgresql": {},
+                    "redis": {},
+                    "oidc": {
+                        "loginRedirectUri": "/v1/auth/oidc/callback",
+                        "tokenSignatureAlgorithm": "RS256"
+                    },
+                    "sendmail": {
+                        "supportsDisplayName": true,
+                        "requiresValidCertificate": true
+                    }
+                },
+                "tags": [
+                    "email",
+                    "marketing",
+                    "crm",
+                    "sales",
+                    "outreach"
+                ],
+                "postInstallMessage": "Warmbly is starting. The first start runs the database migrations and can\ntake a few minutes.\n\n<sso>\n**Claim the instance:** open the app and choose **Continue with** your\nCloudron on the sign-in screen; no email or password is needed. The first\nperson to sign in becomes the owner and platform admin. Later Cloudron\nusers with access to this app get an ordinary account on their first sign-in.\nSet `OIDC_DEFAULT_ORG` in `/app/data/env` to the organization id they should\njoin; without it each new user gets their own organization.\n</sso>\n<nosso>\n**Claim the instance.** In the app's **Terminal**, run:\n\n    warmblyctl setup-link\n\nOpen the link it prints and create the owner account and organization. The\nlink is single-use; run the command again for a fresh one.\n</nosso>\n\nCloudron sign-in needs no invitation: the app's **Access control** decides\nwhich Cloudron users can sign in (set `SSO_AUTO_PROVISION=false` in\n`/app/data/env` to require invitations for them too). Password sign-ups need\nan invitation (`DISABLE_REGISTRATION=invite_only`), and are closed until the\nowner has claimed the instance. Invite the team from the dashboard.\n\nThe admin panel is on the **Admin domain** you chose. Customers' own tracking\ndomains (a CNAME to your tracking domain) need adding as aliases of this app\nso Cloudron issues their certificates.\n\nSettings live in `/app/data/env`. Keep backups: `/app/data/.secrets.env`\nholds the keys that decrypt connected mailbox credentials.\n\nSetup guide: [README](https://github.com/marcusquinn/cloudron-warmbly-app/blob/main/README.md).\n",
+                "changelog": "* Update Warmbly to 0.6.75 at upstream commit 15541ea, with release image digests pinned from upstream's images.json.\n* Pace SMTP sessions when a recipient server limits the worker address, and classify opt-out-only replies as opt-outs.\n* Improve mailbox synchronization status, bounce suppression, warmup schedules, campaign inbox filtering and event notifications (upstream 0.6.75).\n* Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.\n",
+                "packagerName": "Marcus Quinn",
+                "packagerUrl": "https://github.com/marcusquinn/cloudron-warmbly-app",
+                "packageUrl": "https://github.com/marcusquinn/cloudron-warmbly-app",
+                "dockerImage": "ghcr.io/marcusquinn/cloudron-warmbly-app@sha256:36d45896da11647304f0cca505bfbb21ac53f1abeaf4b5e4bd01927e7d26a352"
+            },
+            "creationDate": "Wed, 04 Nov 2026 14:25:50 GMT",
+            "ts": "Wed, 04 Nov 2026 14:25:51 GMT",
+            "publishState": "published"
         }
     }
 }
