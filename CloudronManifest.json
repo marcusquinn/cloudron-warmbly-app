@@ -4,8 +4,8 @@
   "author": "Marcus Quinn <marcus@marcusquinn.com>",
   "description": "file://DESCRIPTION.md",
   "tagline": "Open-source B2B cold outreach and email warmup",
-  "version": "0.1.4",
-  "upstreamVersion": "0.6.72",
+  "version": "0.1.5",
+  "upstreamVersion": "0.6.75",
   "healthCheckPath": "/healthz",
   "httpPort": 8000,
   "httpPorts": {

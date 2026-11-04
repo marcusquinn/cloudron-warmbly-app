@@ -27,3 +27,9 @@
 * Mailbox health follows current server evidence and no longer shows temporary failures on working mailboxes; warmup explains when it skips a persona's off-days (upstream 0.6.71 and 0.6.72).
 * Reply interest can be read in German, French and Spanish for workspaces that choose those tagging languages (upstream 0.6.71).
 * Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
+
+[0.1.5]
+* Update Warmbly to 0.6.75 at upstream commit 15541ea, with release image digests pinned from upstream's images.json.
+* Pace SMTP sessions when a recipient server limits the worker address, and classify opt-out-only replies as opt-outs.
+* Improve mailbox synchronization status, bounce suppression, warmup schedules, campaign inbox filtering and event notifications (upstream 0.6.75).
+* Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.

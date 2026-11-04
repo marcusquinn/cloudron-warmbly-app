@@ -15,17 +15,17 @@
 # release links its Erlang runtime against musl. No BuildKit-only syntax, so
 # Cloudron's on-server build works.
 
-ARG WARMBLY_VERSION=v0.6.72
-ARG WARMBLY_COMMIT=8ce7c0c3225ac44bfa02afda95ed3ef119c0349c
+ARG WARMBLY_VERSION=v0.6.75
+ARG WARMBLY_COMMIT=15541eafe6561a6a985b13b09e96c831d3f4d240
 
-# ── upstream release images (v0.6.72, multi-arch index digests) ─────────────
-FROM ghcr.io/warmbly/warmbly/backend:v0.6.72@sha256:ebbb007823545a07127b145c814893c933c073d6b959e62f3a7e148bf7271b38 AS backend
-FROM ghcr.io/warmbly/warmbly/consumer:v0.6.72@sha256:d5bbdfe25a0286b3bde52026485996d3f1fd201e6f8c606f5653efc5f7edf010 AS consumer
-FROM ghcr.io/warmbly/warmbly/worker:v0.6.72@sha256:cb956d4a223003149bc934311b33f601a462547914bf8a297d72bbe8b70fc181 AS worker
-FROM ghcr.io/warmbly/warmbly/forms:v0.6.72@sha256:dd83c7e701c8dd5d09f3fa4ccc646c222953422716ee0254bc4c72bd894078ef AS forms
-FROM ghcr.io/warmbly/warmbly/tracking:v0.6.72@sha256:5c6b0946250ea0e782fcb1348b860bbf2db5a634e4f92db14c60311a4d488c17 AS tracking
-FROM ghcr.io/warmbly/warmbly/web:v0.6.72@sha256:b765e9e018d821ef915bd908b1fa2af12a04d03bcf49981f18971496ca3bf5d4 AS web
-FROM ghcr.io/warmbly/warmbly/admin:v0.6.72@sha256:207586a7350e180dd9acb4b9a4f9e079127a61b46a55cc601bfbe0b7ee9fd687 AS admin
+# ── upstream release images (v0.6.75, multi-arch index digests) ─────────────
+FROM ghcr.io/warmbly/warmbly/backend:v0.6.75@sha256:831be907ea92673da8c39060793cb797921709ab8d492516c151fe9993b1ca10 AS backend
+FROM ghcr.io/warmbly/warmbly/consumer:v0.6.75@sha256:b72124c217fe4590b39d9b4fbbdebdf4a42b5807cd2c421858ee4b6c1282c2f5 AS consumer
+FROM ghcr.io/warmbly/warmbly/worker:v0.6.75@sha256:14680f3baf8d91b2f20094c5886348ab39e9fc8adf058d48d31331fcb9aa51ef AS worker
+FROM ghcr.io/warmbly/warmbly/forms:v0.6.75@sha256:be262e98efff5a567c7344e7e8c26399374152e62cece9bb4f1f4ac028692e66 AS forms
+FROM ghcr.io/warmbly/warmbly/tracking:v0.6.75@sha256:20361867a808f55c92b7919ce83aebf916342ef72c13a4bcbe6ba3c3a3444ab7 AS tracking
+FROM ghcr.io/warmbly/warmbly/web:v0.6.75@sha256:367708c0fea15b973eaf4a5c23bdcb3d34d2eef59bfad126c808c7880a404cc4 AS web
+FROM ghcr.io/warmbly/warmbly/admin:v0.6.75@sha256:6c79b6c82ae584bbc28de49a88d7dab48cd9dc3e7d5186dc618379391274fd50 AS admin
 # Same NATS series as upstream's compose file.
 FROM nats:2.10-alpine@sha256:b83efabe3e7def1e0a4a31ec6e078999bb17c80363f881df35edc70fcb6bb927 AS nats
 
