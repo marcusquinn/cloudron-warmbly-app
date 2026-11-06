@@ -33,3 +33,9 @@
 * Pace SMTP sessions when a recipient server limits the worker address, and classify opt-out-only replies as opt-outs.
 * Improve mailbox synchronization status, bounce suppression, warmup schedules, campaign inbox filtering and event notifications (upstream 0.6.75).
 * Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
+
+[0.1.6]
+* Update Warmbly to 0.6.78 at upstream commit 19fbb96, with release image digests pinned from upstream's images.json.
+* Size per-mailbox consumer queues from the database pool, hold the warmup reply share evenly and keep replies out of the inbound cap (upstream 0.6.78).
+* Read reply sentiment from the stored verdict, stop a lead's cold sequence once they book a meeting, and relay Outlook read state only when it changes (upstream 0.6.78).
+* Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
