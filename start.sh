@@ -226,16 +226,11 @@ export EMAIL_NAME="${EMAIL_NAME:-${CLOUDRON_MAIL_FROM_DISPLAY_NAME:-Warmbly}}"
 # ── dashboard and admin runtime config (upstream renderers) ─────────────────
 cp /app/code/web/csp-template.txt "${RUNDIR}/web/"
 [[ -f /app/code/web/csp-origins.txt ]] && cp /app/code/web/csp-origins.txt "${RUNDIR}/web/"
-# Same rule as the backend: Gmail connect is on once the OAuth client is set,
-# unless BOX_GOOGLE_OAUTH_CONNECT turns it off.
-gmail_connect=false
-if [[ -n "${BOX_GOOGLE_CLIENT_ID:-}" && -n "${BOX_GOOGLE_CLIENT_SECRET:-}" ]]; then
-	gmail_connect="${BOX_GOOGLE_OAUTH_CONNECT:-true}"
-fi
+# The dashboard offers Gmail sign-in whenever the backend allows it
+# (BOX_GOOGLE_OAUTH_CONNECT is read by the backend only).
 WARMBLY_CONFIG_OUT="${RUNDIR}/web/config.js" \
 	WARMBLY_API_URL="${API_ORIGIN}" \
 	WARMBLY_APP_URL="${APP_ORIGIN}" \
-	WARMBLY_GMAIL_OAUTH_CONNECT="${gmail_connect}" \
 	WEBSOCKET_URL="wss://${API_DOMAIN}/v1/realtime/socket/websocket" \
 	sh /app/code/upstream/web-config.sh
 # The renderer only patches the nginx header file at its default path; apply
