@@ -39,3 +39,12 @@
 * Size per-mailbox consumer queues from the database pool, hold the warmup reply share evenly and keep replies out of the inbound cap (upstream 0.6.78).
 * Read reply sentiment from the stored verdict, stop a lead's cold sequence once they book a meeting, and relay Outlook read state only when it changes (upstream 0.6.78).
 * Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
+
+[0.1.7]
+* Update Warmbly to 0.7.2 at upstream commit 7af95ad, with release image digests pinned from upstream's images.json.
+* Lead finder: search a map for businesses (OpenStreetMap by default, no key needed), enrich them with website emails and add them to contacts (upstream 0.7.0).
+* Per-campaign ramp-up, sending in each lead's local time, region segments, warmup recipients balanced by provider, and shared notifications sent as one digest (upstream 0.7.2).
+* Typed mailbox send pauses, better bounce accuracy, opt-in per-step inbox rotation and client roles for restricted members (upstream 0.7.0).
+* Gmail mailboxes connected with your own Google OAuth client now ask for full mail access (https://mail.google.com/) so warmup can run over IMAP; add that scope to the client's consent screen. The dashboard offers Google sign-in whenever the backend allows it (upstream 0.7.0).
+* IMAP folder cursors work with NetEase servers (upstream 0.7.1).
+* Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.

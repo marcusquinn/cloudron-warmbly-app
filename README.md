@@ -141,6 +141,13 @@ Gmail and Microsoft 365 mailboxes connect with OAuth clients you register:
 | Google (Web application client) | `https://<API domain>/addresses/google/callback` | `BOX_GOOGLE_CLIENT_ID`, `BOX_GOOGLE_CLIENT_SECRET` |
 | Microsoft (Entra app registration) | `https://<API domain>/addresses/outlook/callback` | `BOX_OUTLOOK_CLIENT_ID`, `BOX_OUTLOOK_CLIENT_SECRET` |
 
+The Google client requests the Gmail scopes `https://mail.google.com/` (full
+mail access, so warmup can run over IMAP) and
+`https://www.googleapis.com/auth/gmail.settings.basic` (send-as aliases). Add
+both to the client's OAuth consent screen. Both are restricted scopes, so an
+external app Google has not verified accepts only its listed test users, up to
+Google's user cap; an Internal app in your own Workspace needs no verification.
+
 Restart the app after setting them. Without them, connected OAuth mailboxes
 stop syncing when their tokens expire, and the start log says so.
 
