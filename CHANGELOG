@@ -48,3 +48,10 @@
 * Gmail mailboxes connected with your own Google OAuth client now ask for full mail access (https://mail.google.com/) so warmup can run over IMAP; add that scope to the client's consent screen. The dashboard offers Google sign-in whenever the backend allows it (upstream 0.7.0).
 * IMAP folder cursors work with NetEase servers (upstream 0.7.1).
 * Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
+
+[0.1.8]
+* Update Warmbly to 0.7.3 at upstream commit 443b6c8, with release image digests pinned from upstream's images.json.
+* Lead finder falls back to a reader and web search for sites that turn it away; warmup hides other services' mail, with an opt-in warmup filter tag (upstream 0.7.3).
+* A cancelled scheduled email is never sent, interrupted manual sends are settled, and Idempotency-Key records are tied to the credential and resource (upstream 0.7.3).
+* `warmblyctl backup` and `restore` match the PostgreSQL client to the server, and restore is transactional; integration credentials are carried in workspace archives (upstream 0.7.3).
+* Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
