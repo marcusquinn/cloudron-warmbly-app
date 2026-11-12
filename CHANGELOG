@@ -55,3 +55,10 @@
 * A cancelled scheduled email is never sent, interrupted manual sends are settled, and Idempotency-Key records are tied to the credential and resource (upstream 0.7.3).
 * `warmblyctl backup` and `restore` match the PostgreSQL client to the server, and restore is transactional; integration credentials are carried in workspace archives (upstream 0.7.3).
 * Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
+
+[0.1.9]
+* Update Warmbly to 0.8.1 at upstream commit 1f8aa35, with release image digests pinned from upstream's images.json.
+* Warmbly for Agencies: agency accounts, a shared monthly send pool, client connect links and reports, plan switching and agency checkouts (upstream 0.8.0 and 0.8.1). Agency portal and billing features need the separate upstream portal service, which this package does not run.
+* Positive-reply notifications are on by default, the Members roster can transfer ownership, and the Advisor shows only findings that affect deliverability or sending (upstream 0.8.0).
+* Redesigned plan chooser popup and plan cards (upstream 0.8.1).
+* Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.

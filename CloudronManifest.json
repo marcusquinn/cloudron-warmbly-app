@@ -4,8 +4,8 @@
   "author": "Marcus Quinn <marcus@marcusquinn.com>",
   "description": "file://DESCRIPTION.md",
   "tagline": "Open-source B2B cold outreach and email warmup",
-  "version": "0.1.8",
-  "upstreamVersion": "0.7.3",
+  "version": "0.1.9",
+  "upstreamVersion": "0.8.1",
   "healthCheckPath": "/healthz",
   "httpPort": 8000,
   "httpPorts": {
@@ -51,7 +51,7 @@
   "forumUrl": "https://forum.cloudron.io/topic/16229/warmbly-open-source-cold-outreach-and-email-warmup-campaigns-unified-inbox-crm-with-cloudron-sso-and-cloudron-mail",
   "upstreamLicense": {
     "name": "Apache-2.0",
-    "url": "https://github.com/warmbly/warmbly/blob/443b6c8d3070240018c7993d2be42e777559ce34/LICENSE"
+    "url": "https://github.com/warmbly/warmbly/blob/1f8aa35feae270dcf063c0bdfc935c4f7bc764df/LICENSE"
   },
   "minBoxVersion": "10.0.0",
   "memoryLimit": 2147483648,
