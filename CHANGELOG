@@ -62,3 +62,10 @@
 * Positive-reply notifications are on by default, the Members roster can transfer ownership, and the Advisor shows only findings that affect deliverability or sending (upstream 0.8.0).
 * Redesigned plan chooser popup and plan cards (upstream 0.8.1).
 * Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
+
+[0.1.10]
+* Update Warmbly to 0.8.4 at upstream commit 9e2bef9, with release image digests pinned from upstream's images.json.
+* Worker reload storms stop, and mailboxes whose server refuses the sign-in or stays unreachable for 72 hours are switched off (upstream 0.8.2 and 0.8.3).
+* Agency Mailboxes page, client connect links for inbox vendor accounts, automatic send-pool top-ups and a redesigned brand editor (upstream 0.8.2). Agency portal features need the separate upstream portal service, which this package does not run.
+* Admin removal of every mailbox on a domain owner's domains, and instance health checks compare registered domains by eTLD+1 (upstream 0.8.4).
+* Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
