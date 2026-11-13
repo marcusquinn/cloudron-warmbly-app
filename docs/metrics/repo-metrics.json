@@ -1,0 +1,100 @@
+{
+  "schema": "aidevops.repo-metrics.v1",
+  "schema_version": 1,
+  "generated_at": "2026-11-13T11:54:38Z",
+  "tool": {
+    "name": "aidevops repo-metrics",
+    "version": "1.0.0"
+  },
+  "repo": {
+    "name": "cloudron-warmbly-app",
+    "slug": "marcusquinn/cloudron-warmbly-app"
+  },
+  "summary": {
+    "source_files": 15,
+    "code": 1986,
+    "comments": 117,
+    "blanks": 168,
+    "languages": 7,
+    "dependencies": 0
+  },
+  "languages": [
+    {
+      "name": "JSON",
+      "files": 2,
+      "code": 986,
+      "comments": 0,
+      "blanks": 0,
+      "percentage": 49.65,
+      "color": "#292929"
+    },
+    {
+      "name": "Markdown",
+      "files": 5,
+      "code": 439,
+      "comments": 0,
+      "blanks": 108,
+      "percentage": 22.1,
+      "color": "#083fa1"
+    },
+    {
+      "name": "Shell",
+      "files": 2,
+      "code": 245,
+      "comments": 55,
+      "blanks": 29,
+      "percentage": 12.34,
+      "color": "#89e051"
+    },
+    {
+      "name": "HTML",
+      "files": 2,
+      "code": 113,
+      "comments": 4,
+      "blanks": 0,
+      "percentage": 5.69,
+      "color": "#e34c26"
+    },
+    {
+      "name": "Dockerfile",
+      "files": 1,
+      "code": 82,
+      "comments": 30,
+      "blanks": 11,
+      "percentage": 4.13,
+      "color": "#384d54"
+    },
+    {
+      "name": "JavaScript",
+      "files": 1,
+      "code": 76,
+      "comments": 13,
+      "blanks": 13,
+      "percentage": 3.83,
+      "color": "#f1e05a"
+    },
+    {
+      "name": "YAML",
+      "files": 2,
+      "code": 45,
+      "comments": 15,
+      "blanks": 7,
+      "percentage": 2.27,
+      "color": "#cb171e"
+    }
+  ],
+  "dependencies": {
+    "direct": 0,
+    "runtime": 0,
+    "dev": 0,
+    "locked": 0,
+    "total": 0,
+    "ecosystems": [],
+    "manifests": []
+  },
+  "refresh": {
+    "default_policy": "weekly scheduled refresh plus manual runs; skip generated outputs younger than 24h in managed workflows",
+    "cost_profile": "fast local git/unignored-file scan; no network by default",
+    "top_languages": 6
+  }
+}
