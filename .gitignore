@@ -1,0 +1,6 @@
+# Cloudron
+.cloudron/
+
+# aidevops runtime state
+.agents/loop-state/
+.agents/tmp/
