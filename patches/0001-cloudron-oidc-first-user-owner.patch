@@ -157,7 +157,7 @@ diff --git a/internal/app/auth/external_idtoken.go b/internal/app/auth/external_
  		}
 +		firstOwner := s.firstOwnerCandidate(ctx, provider)
  		var cerr error
- 		u, cerr = s.createExternalUser(ctx, email, firstName, lastName)
+ 		u, cerr = s.createExternalUser(ctx, email, firstName, lastName, acq)
  		if errors.Is(cerr, repository.ErrUserEmailTaken) {
 @@ -161,6 +165,9 @@ func (s *authService) resolveFederated(ctx context.Context, provider, issuer, su
  			errs.CaptureException(cerr)
