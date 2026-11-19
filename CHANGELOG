@@ -72,3 +72,8 @@
 * Contact limits apply per workspace; retried temporary send failures and held-back sends show as delays instead of alerts; the warmup chart shows each day's planned target; mailbox deletes no longer stall on unindexed tables (upstream 0.8.7).
 * Fewer false Advisor alarms on self-hosted instances, and Remie and the MCP server can read the API and docs (upstream 0.8.5).
 * Rebase the Cloudron first-owner sign-in patch onto upstream's new sign-in attribution; keep the pinned Cloudron 6.0.1 base.
+
+[0.1.11]
+* Update Warmbly to 0.8.9 at upstream commit 000d2e7, with release image digests pinned from upstream's images.json.
+* Warmup retention deletes and removal checks give up at once when the mailbox's IMAP server cannot be reached (upstream 0.8.9).
+* Per-mailbox Kafka worker queues, per-lead email review with optional approval before sending, warmup replies under a Re: subject, and the warmup reply share held at the mailbox reply rate (upstream 0.8.8).
