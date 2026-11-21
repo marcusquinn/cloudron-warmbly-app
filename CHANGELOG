@@ -76,4 +76,4 @@
 [0.1.11]
 * Update Warmbly to 0.8.9 at upstream commit 000d2e7, with release image digests pinned from upstream's images.json.
 * Warmup retention deletes and removal checks give up at once when the mailbox's IMAP server cannot be reached (upstream 0.8.9).
-* Per-mailbox Kafka worker queues, per-lead email review with optional approval before sending, warmup replies under a Re: subject, and the warmup reply share held at the mailbox reply rate (upstream 0.8.8).
+* Per-lead email review with optional approval before sending, warmup replies under a Re: subject, and the warmup reply share held at the mailbox reply rate (upstream 0.8.8; the per-mailbox Kafka worker queue change does not apply here because this package uses NATS).
