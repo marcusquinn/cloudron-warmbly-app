@@ -79,6 +79,8 @@
 * Per-lead email review with optional approval before sending, warmup replies under a Re: subject, and the warmup reply share held at the mailbox reply rate (upstream 0.8.8; the per-mailbox Kafka worker queue change does not apply here because this package uses NATS).
 
 [0.1.12]
-* Update Warmbly to 0.9.2 at upstream commit 2db2e52, with release image digests pinned from upstream's images.json.
+* Update Warmbly to 0.9.3 at upstream commit 53e3caa, with release image digests pinned from upstream's images.json.
 * In-app store for domains and Google Workspace or Microsoft 365 mailboxes with a shared prepaid balance, and Microsoft 365 tenant consent for purchased mailboxes (upstream 0.9.0 to 0.9.2).
+* Purchased Google mailboxes connect through the mail vendor's sign-in, and store orders stuck for 72 hours are flagged (upstream 0.9.3).
 * Admin settings for full mailbox check intervals; store dropdown and text display fixes (upstream 0.9.2).
+* Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
