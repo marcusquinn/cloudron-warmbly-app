@@ -84,3 +84,9 @@
 * Purchased Google mailboxes connect through the mail vendor's sign-in, and store orders stuck for 72 hours are flagged (upstream 0.9.3).
 * Admin settings for full mailbox check intervals; store dropdown and text display fixes (upstream 0.9.2).
 * Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
+
+[0.1.13]
+* Update Warmbly to 0.9.4 at upstream commit a4b9686, with release image digests pinned from upstream's images.json.
+* Operator switch to pause new domain and mailbox purchases, a social add-on for LinkedIn, Instagram, WhatsApp, Telegram and Facebook (self-hosted instances need GraphKit partner credentials to enable it), and a 3% processing fee on balance top-ups (upstream 0.9.4).
+* Warmup partner selection and Gmail and Outlook message-map lookups are cached to ease load on the control plane (upstream 0.9.4).
+* Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
