@@ -90,3 +90,8 @@
 * Operator switch to pause new domain and mailbox purchases, a social add-on for LinkedIn, Instagram, WhatsApp, Telegram and Facebook (self-hosted instances need GraphKit partner credentials to enable it), and a 3% processing fee on balance top-ups (upstream 0.9.4).
 * Warmup partner selection and Gmail and Outlook message-map lookups are cached to ease load on the control plane (upstream 0.9.4).
 * Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
+
+[0.1.14]
+* Update Warmbly to 0.9.5 at upstream commit 20a7bce, with release image digests pinned from upstream's images.json.
+* Fix: the sign-in link for a purchased mailbox is now minted while the vendor is still setting the mailbox up (upstream 0.9.5).
+* Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
