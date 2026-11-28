@@ -100,3 +100,8 @@
 * Update Warmbly to 0.9.6 at upstream commit dc104fd, with release image digests pinned from upstream's images.json.
 * Connect purchased Microsoft mailboxes by vendor sign-in (upstream 0.9.6).
 * Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
+
+[0.1.16]
+* Update Warmbly to 0.9.8 at upstream commit ae8a795, with release image digests pinned from upstream's images.json.
+* Fix: refuse a sign-in when the link's required address cannot be read (upstream 0.9.8).
+* Retain the Cloudron first-owner sign-in patch and the pinned Cloudron 6.0.1 base.
